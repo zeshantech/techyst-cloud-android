@@ -90,7 +90,51 @@ val ncTestServerUsername = configProps["NC_TEST_SERVER_USERNAME"]
 val ncTestServerPassword = configProps["NC_TEST_SERVER_PASSWORD"]
 val ncTestServerBaseUrl = configProps["NC_TEST_SERVER_BASEURL"]
 
+// --- Techyst Cloud release signing -------------------------------------------
+// The upload key never lives in this repository. Two sources, in order:
+//   1. keystore.properties in the repo root (local builds; gitignored)
+//   2. environment variables (CI): TECHYST_KEYSTORE_PATH, TECHYST_KEYSTORE_PASSWORD,
+//      TECHYST_KEY_ALIAS, TECHYST_KEY_PASSWORD
+// If neither is present, no release signing config is registered and
+// `bundleGplayRelease` produces an unsigned bundle rather than failing, so
+// contributors can build the project without our key.
+val keystoreProps = Properties().apply {
+    val f = rootProject.file("keystore.properties")
+    if (f.exists()) load(FileInputStream(f))
+}
+
+fun signingValue(propKey: String, envKey: String): String? =
+    (keystoreProps[propKey] as String?)?.takeIf { it.isNotBlank() }
+        ?: System.getenv(envKey)?.takeIf { it.isNotBlank() }
+
+val releaseStorePath = signingValue("storeFile", "TECHYST_KEYSTORE_PATH")
+val releaseStorePassword = signingValue("storePassword", "TECHYST_KEYSTORE_PASSWORD")
+val releaseKeyAlias = signingValue("keyAlias", "TECHYST_KEY_ALIAS")
+val releaseKeyPassword = signingValue("keyPassword", "TECHYST_KEY_PASSWORD")
+val hasReleaseSigning = listOf(
+    releaseStorePath, releaseStorePassword, releaseKeyAlias, releaseKeyPassword
+).all { it != null } && file(releaseStorePath!!).exists()
+
+if (!hasReleaseSigning) {
+    logger.lifecycle("No release signing material found; release artifacts will be unsigned.")
+}
+
 android {
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = file(releaseStorePath!!)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+                // Play App Signing re-signs the bundle, but v1 is still needed
+                // for the upload signature to verify on Google's side.
+                enableV1Signing = true
+                enableV2Signing = true
+            }
+        }
+    }
+
     // install this NDK version and CMake to produce smaller APKs. Build will still work if not installed
     ndkVersion = "${ndkEnv["NDK_VERSION"]}"
     externalNativeBuild {
@@ -112,7 +156,7 @@ android {
             "TEST_SERVER_PASSWORD" to ncTestServerPassword.toString(),
             "disableAnalytics" to "true"
         )
-        applicationId = "com.nextcloud.client"
+        applicationId = "net.techyst.cloud"
         minSdk = 28
         targetSdk = 36
         compileSdk = 37
@@ -143,6 +187,9 @@ android {
         buildTypes {
             release {
                 buildConfigField("String", "NC_TEST_SERVER_DATA_STRING", "\"\"")
+                if (hasReleaseSigning) {
+                    signingConfig = signingConfigs.getByName("release")
+                }
             }
 
             debug {
@@ -155,12 +202,12 @@ android {
         productFlavors {
             // used for f-droid
             register("generic") {
-                applicationId = "com.nextcloud.client"
+                applicationId = "net.techyst.cloud"
                 dimension = "default"
             }
 
             register("gplay") {
-                applicationId = "com.nextcloud.client"
+                applicationId = "net.techyst.cloud"
                 dimension = "default"
             }
 

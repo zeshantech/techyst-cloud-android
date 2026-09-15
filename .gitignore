@@ -94,3 +94,8 @@ jacoco/
 # python
 **/__pycache__/
 /gradle/verification-keyring.gpg
+
+# Techyst Cloud: release signing material never enters the repository.
+keystore.properties
+*.jks
+*.keystore

@@ -11,26 +11,26 @@
     <bool name="dev_version_direct_download_enabled">false</bool>
 
     <!-- App name  and other strings-->
-    <string name="app_name">Nextcloud</string>
-    <string name="account_type">nextcloud</string>     <!-- better if was a domain name; but changing it now would require migrate accounts when the app is updated -->
-    <string name="authority">org.nextcloud</string>    <!-- better if was the app package with ".provider" appended ; it identifies the provider -->
-    <string name="users_and_groups_search_authority">com.nextcloud.android.providers.UsersAndGroupsSearchProvider</string>
-    <string name="users_and_groups_share_with">com.nextcloud.android.providers.UsersAndGroupsSearchProvider.action.SHARE_WITH</string>
-    <string name="document_provider_authority">org.nextcloud.documents</string>
-    <string name="file_provider_authority">org.nextcloud.files</string>
-    <string name="image_cache_provider_authority">org.nextcloud.imageCache.provider</string>
-    <string name="db_file">nextcloud.db</string>
-    <string name="db_name">nextcloud</string>
-    <string name="data_folder">nextcloud</string>
-    <string name="default_display_name_for_root_folder">Nextcloud</string>
+    <string name="app_name">Techyst Cloud</string>
+    <string name="account_type">techyst</string>     <!-- better if was a domain name; but changing it now would require migrate accounts when the app is updated -->
+    <string name="authority">net.techyst.cloud.provider</string>    <!-- better if was the app package with ".provider" appended ; it identifies the provider -->
+    <string name="users_and_groups_search_authority">net.techyst.cloud.providers.UsersAndGroupsSearchProvider</string>
+    <string name="users_and_groups_share_with">net.techyst.cloud.providers.UsersAndGroupsSearchProvider.action.SHARE_WITH</string>
+    <string name="document_provider_authority">net.techyst.cloud.documents</string>
+    <string name="file_provider_authority">net.techyst.cloud.files</string>
+    <string name="image_cache_provider_authority">net.techyst.cloud.imageCache.provider</string>
+    <string name="db_file">techyst_cloud.db</string>
+    <string name="db_name">techyst_cloud</string>
+    <string name="data_folder">techystcloud</string>
+    <string name="default_display_name_for_root_folder">Techyst Cloud</string>
     <string name="nextcloud_user_agent">Mozilla/5.0 (Android) Nextcloud-android/%1$s%2$s</string>
     <string name="office_user_agent">Mozilla/5.0 (Android %1$s) Mobile Nextcloud-android/%2$s</string>
-    <string name="name_for_branded_user_agent"></string>
+    <string name="name_for_branded_user_agent">Techyst Cloud</string>
 
     <!-- URLs and flags related -->
-    <bool name="show_server_url_input">true</bool>
-    <bool name="show_provider_or_own_installation">true</bool>
-    <string name="provider_registration_server">https://www.nextcloud.com/register</string>
+    <bool name="show_server_url_input">false</bool>
+    <bool name="show_provider_or_own_installation">false</bool>
+    <string name="provider_registration_server">https://cloud.techyst.net</string>
 
     <!-- specify built in proxy -->
     <string name="proxy_host"></string>
@@ -50,7 +50,7 @@
     <bool name="share_with_users_feature">true</bool>
     <bool name="show_external_links">true</bool>
     <bool name="show_outdated_server_warning">true</bool>
-    <bool name="is_branded_client">false</bool>
+    <bool name="is_branded_client">true</bool>
     <bool name="is_branded_plus_client">false</bool>
 
     <!-- Calendar & Contacts backup -->
@@ -61,16 +61,16 @@
     <bool name="show_calendar_backup">true</bool>
 
     <!-- What's new -->
-    <bool name="show_whats_new">true</bool>
+    <bool name="show_whats_new">false</bool>
     <!-- To fill if you want to show webviews instead of regular welcome views -->
     <array name="whatsnew_urls"></array>
 
     <!-- Colors -->
-    <color name="primary">#0082c9</color>
-    <color name="primary_dark">#006AA3</color>
-    <color name="color_accent">#007cc2</color>
-    <color name="login_text_color">#ffffff</color>
-    <color name="login_text_hint_color">#7fC0E3</color>
+    <color name="primary">#1E7096</color>
+    <color name="primary_dark">#195673</color>
+    <color name="color_accent">#E77129</color>
+    <color name="login_text_color">#FFFFFF</color>
+    <color name="login_text_hint_color">#A8CBDD</color>
 
     <!-- Multiaccount support -->
     <bool name="multiaccount_support">true</bool>
@@ -84,20 +84,20 @@
     <bool name="device_credentials_enabled">true</bool>
     <bool name="show_hidden_files_enabled">true</bool>
     <bool name="davdroid_integration_enabled">true</bool>
-    <bool name="help_enabled">true</bool>
-    <string name="url_help">https://help.nextcloud.com/c/clients/android/</string>
+    <bool name="help_enabled">false</bool>
+    <string name="url_help"></string>
     <bool name="privacy_enabled">true</bool>
-    <string name="privacy_url">https://nextcloud.com/privacy</string>
-    <bool name="imprint_enabled">false</bool>
-    <bool name="recommend_enabled">true</bool>
+    <string name="privacy_url">https://techyst.net/cloud/privacy</string>
+    <bool name="imprint_enabled">true</bool>
+    <bool name="recommend_enabled">false</bool>
     <bool name="logger_enabled">false</bool>
     <bool name="sourcecode_enabled">true</bool>
-    <string name="sourcecode_url" translatable="false">https://github.com/nextcloud/android</string>
+    <string name="sourcecode_url" translatable="false">https://github.com/zeshantech/techyst-cloud-android</string>
     <bool name="license_enabled">true</bool>
     <string name="license_url" translatable="false">https://www.gnu.org/licenses/gpl-2.0.html</string>
-    <string name="url_imprint"></string>
-    <string name="url_app_download">"https://play.google.com/store/apps/details?id=com.nextcloud.client"</string>
-    <string name="url_server_install">https://nextcloud.com/install</string>
+    <string name="url_imprint">https://techyst.net/cloud/terms</string>
+    <string name="url_app_download">https://play.google.com/store/apps/details?id=net.techyst.cloud</string>
+    <string name="url_server_install">https://cloud.techyst.net</string>
 
     <!-- synced folder light; if enabled: move to setting & global upload settings -->
     <bool name="syncedFolder_light">false</bool>
@@ -107,31 +107,31 @@
     <string name="syncedFolder_light_upload_behaviour">FilesUploadWorker.LOCAL_BEHAVIOUR_FORGET</string>
 
     <!--Destination mail for sending log files -->
-    <string name="mail_logger"></string>
+    <string name="mail_logger">team@techyst.net</string>
 
     <!-- Determine is participate enabled -->
-    <bool name="participate_enabled">true</bool>
+    <bool name="participate_enabled">false</bool>
     <!-- Participate links -->
-    <string name="fdroid_beta_link" translatable="false">https://f-droid.org/repository/browse/?fdid=com.nextcloud.android.beta</string>
-    <string name="beta_apk_link" translatable="false">https://download.nextcloud.com/android/dev/latest.apk</string>
-    <string name="play_store_register_beta" translatable="false">https://play.google.com/apps/testing/com.nextcloud.client</string>
-    <string name="fdroid_link" translatable="false">https://f-droid.org/repository/browse/?fdid=com.nextcloud.client</string>
-    <string name="help_link" translatable="false">https://help.nextcloud.com/c/clients/android</string>
-    <string name="translation_link" translatable="false">https://app.transifex.com/nextcloud/nextcloud/android/</string>
-    <string name="contributing_link" translatable="false">https://github.com/nextcloud/android/blob/master/CONTRIBUTING.md</string>
+    <string name="fdroid_beta_link" translatable="false"></string>
+    <string name="beta_apk_link" translatable="false"></string>
+    <string name="play_store_register_beta" translatable="false">https://play.google.com/apps/testing/net.techyst.cloud</string>
+    <string name="fdroid_link" translatable="false"></string>
+    <string name="help_link" translatable="false"></string>
+    <string name="translation_link" translatable="false">https://github.com/zeshantech/techyst-cloud-android</string>
+    <string name="contributing_link" translatable="false">https://github.com/zeshantech/techyst-cloud-android/blob/core/CONTRIBUTING.md</string>
     <!-- For semi-automated bug report creation -->
-    <string name="report_issue_link" translatable="false">https://github.com/nextcloud/android/issues/new?template=bug_report.yml</string>
+    <string name="report_issue_link" translatable="false">https://github.com/zeshantech/techyst-cloud-android/issues/new</string>
     <!-- For manual report from user -->
-    <string name="report_issue_empty_link" translatable="false">https://github.com/nextcloud/android/issues/new/choose</string>
+    <string name="report_issue_empty_link" translatable="false">https://github.com/zeshantech/techyst-cloud-android/issues</string>
 
     <!-- login data links -->
-    <string name="login_data_own_scheme" translatable="false">nc</string>
+    <string name="login_data_own_scheme" translatable="false">techystcloud</string>
     <!-- url for webview login, with the protocol prefix and with full url (normally /index.php/login/flow)
     If set, will replace all other login methods available -->
     <string name="webview_login_url" translatable="false"></string>
 
     <!--    [{\"name\":\"name1\",\"url\":\"url\"},{\"name\":\"name2\",\"url\":\"url1\"}]-->
-    <string name="enforce_servers" translatable="false"></string>
+    <string name="enforce_servers" translatable="false">[{"name":"Techyst Cloud","url":"https://cloud.techyst.net"}]</string>
 
     
     <!-- Files becomes Home -->
@@ -141,8 +141,8 @@
     <string name="push_server_url" translatable="false"></string>
 
     <!-- if contains values, will be used to show branding title below app icon in splash screen -->
-    <string name="splashScreenBold"></string>
-    <string name="splashScreenNormal"></string>
+    <string name="splashScreenBold">Techyst</string>
+    <string name="splashScreenNormal">Cloud</string>
 
     <!-- Geocoding -->
     <string name="osm_geocoder_url" translatable="false">https://nominatim.openstreetmap.org/</string>

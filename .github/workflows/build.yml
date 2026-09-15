@@ -1,0 +1,75 @@
+# Techyst Cloud — branch and PR verification.
+#
+# Builds the `generic` flavour, which has no Firebase dependency, so this runs
+# green before the Firebase project exists and still exercises every branding
+# edit: the renamed application id, the rewritten setup.xml resources and the
+# replaced icon drawables all have to compile and link here.
+name: build
+
+on:
+  push:
+    branches: [core]
+  pull_request:
+    branches: [core]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Branding is applied and idempotent
+        run: python3 branding/apply-branding.py --check
+
+      - name: No Nextcloud trademark assets remain
+        run: |
+          # Upstream ships its logo under a trademark-only licence. A rebranded
+          # build may not redistribute it, so its presence is a build failure.
+          if grep -rn 'SPDX-License-Identifier:.*NextcloudTrademarks' \
+               --include='*.xml' app/ 2>/dev/null; then
+            echo "::error::a trademark-licensed asset is still present"
+            exit 1
+          fi
+          echo "no trademark-licensed resources found"
+
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: gradle/actions/setup-gradle@ac638b010cf58a27ee6c972d7336334ccaf61c96 # v4.4.1
+
+      - name: Install NDK and CMake
+        continue-on-error: true
+        run: |
+          set -a; . ./ndk.env; set +a
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            "ndk;$NDK_VERSION" "cmake;$CMAKE_VERSION" >/dev/null
+
+      - name: Assemble generic debug
+        env:
+          CI: "true"
+        run: ./gradlew --no-daemon --stacktrace assembleGenericDebug
+
+      - name: Unit tests
+        env:
+          CI: "true"
+        run: ./gradlew --no-daemon testGenericDebugUnitTest
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: test-reports-${{ github.sha }}
+          path: |
+            app/build/reports/**
+          if-no-files-found: ignore
+          retention-days: 7

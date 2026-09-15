@@ -4,16 +4,9 @@
   ~ SPDX-FileCopyrightText: 2026 Zeshan Shakil
   ~ SPDX-License-Identifier: AGPL-3.0-or-later OR GPL-2.0-only
   ~
-  ~ The Techyst mark: the product letter in round-capped strokes of one weight,
-  ~ with the family's detached orange dot at the shoulder. Geometry comes from
-  ~ .brand/marks.py on a 64-unit box; the group below scales that box to 1.062
-  ~ and centres it in the 108dp adaptive-icon canvas so the whole mark stays
-  ~ inside the 66dp safe zone that every launcher mask is guaranteed to show.
-  ~
-  ~ This file replaces upstream's ic_launcher_foreground.xml, which carried the
-  ~ Nextcloud logo under LicenseRef-NextcloudTrademarks. That mark is a
-  ~ Nextcloud GmbH trademark and is not licensed for redistribution in a
-  ~ rebranded build, so it must not be shipped here.
+  ~ Themed-icon layer. Android tints this with the user's wallpaper colours, so
+  ~ it must be a single-colour silhouette: the dot is drawn in the same colour
+  ~ as the letter rather than the family orange.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
@@ -27,18 +20,18 @@
         android:translateY="20.02">
         <path
             android:pathData="M8,12 L48,12"
-            android:strokeColor="#F1F5F9"
+            android:strokeColor="#000000"
             android:strokeWidth="11"
             android:strokeLineCap="round"
             android:strokeLineJoin="round" />
         <path
             android:pathData="M28,12 L28,52"
-            android:strokeColor="#F1F5F9"
+            android:strokeColor="#000000"
             android:strokeWidth="11"
             android:strokeLineCap="round"
             android:strokeLineJoin="round" />
         <path
             android:pathData="M52,18 m-7,0 a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0"
-            android:fillColor="#E77129" />
+            android:fillColor="#000000" />
     </group>
 </vector>

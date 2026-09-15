@@ -1,0 +1,125 @@
+# Techyst Cloud — signed Android App Bundle.
+#
+# Produces the .aab for manual upload to the Play Console (internal testing
+# first). It deliberately does NOT publish to Google Play: no service account
+# is configured, and the first release of a new package has to be created by
+# hand in the console anyway.
+name: release-aab
+
+on:
+  workflow_dispatch:
+    inputs:
+      notes:
+        description: "Short note recorded in the run summary"
+        required: false
+        default: ""
+  push:
+    tags:
+      - "v*"
+
+# A release build writes nothing back to the repository.
+permissions:
+  contents: read
+
+concurrency:
+  group: release-aab
+  cancel-in-progress: false
+
+jobs:
+  bundle:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          # Full history: the GPL obligation is to ship the corresponding
+          # source, and a shallow clone in the build log is a poor record of it.
+          fetch-depth: 0
+
+      # Fail early and loudly rather than shipping a build with no push
+      # notifications. Nextcloud's FCM project must never be used here.
+      - name: Check Firebase configuration is present
+        run: |
+          setup=app/src/gplay/res/values/setup.xml
+          appId=$(sed -n 's|.*<string name="google_app_id"[^>]*>\(.*\)</string>.*|\1|p' "$setup")
+          sender=$(sed -n 's|.*<string name="gcm_defaultSenderId"[^>]*>\(.*\)</string>.*|\1|p' "$setup")
+          if [ -z "$appId" ] || [ -z "$sender" ]; then
+            echo "::error::Firebase is not configured. Run branding/apply-firebase.py with your own google-services.json and commit the result."
+            exit 1
+          fi
+          case "$sender" in
+            829118773643)
+              echo "::error::gcm_defaultSenderId is Nextcloud's FCM sender. Use your own Firebase project."
+              exit 1
+              ;;
+          esac
+          echo "Firebase sender $sender configured."
+
+      - name: Check branding is applied
+        run: python3 branding/apply-branding.py --check
+
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: gradle/actions/setup-gradle@ac638b010cf58a27ee6c972d7336334ccaf61c96 # v4.4.1
+
+      - name: Install NDK and CMake
+        # The build works without them (smaller APKs is the only benefit), so a
+        # failure here must not fail the release.
+        continue-on-error: true
+        run: |
+          set -a; . ./ndk.env; set +a
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            "ndk;$NDK_VERSION" "cmake;$CMAKE_VERSION" >/dev/null
+
+      - name: Restore upload keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.TECHYST_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::error::secret TECHYST_KEYSTORE_BASE64 is not set"
+            exit 1
+          fi
+          umask 077
+          printf '%s' "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+          test -s "$RUNNER_TEMP/upload.jks"
+
+      - name: Build signed bundle
+        env:
+          TECHYST_KEYSTORE_PATH: ${{ runner.temp }}/upload.jks
+          TECHYST_KEYSTORE_PASSWORD: ${{ secrets.TECHYST_KEYSTORE_PASSWORD }}
+          TECHYST_KEY_ALIAS: ${{ secrets.TECHYST_KEY_ALIAS }}
+          TECHYST_KEY_PASSWORD: ${{ secrets.TECHYST_KEY_PASSWORD }}
+          CI: "true"
+        run: ./gradlew --no-daemon --stacktrace bundleGplayRelease
+
+      - name: Remove the keystore
+        # Runs even when the build fails, so the key never survives the job.
+        if: always()
+        run: shred -u "$RUNNER_TEMP/upload.jks" 2>/dev/null || rm -f "$RUNNER_TEMP/upload.jks"
+
+      - name: Describe the artifact
+        run: |
+          aab=$(find app/build/outputs/bundle -name '*.aab' | head -1)
+          echo "AAB: $aab"
+          echo "SHA-256: $(sha256sum "$aab" | cut -d' ' -f1)"
+          {
+            echo "### Techyst Cloud bundle"
+            echo
+            echo "| field | value |"
+            echo "| --- | --- |"
+            echo "| file | \`$(basename "$aab")\` |"
+            echo "| size | $(du -h "$aab" | cut -f1) |"
+            echo "| sha256 | \`$(sha256sum "$aab" | cut -d' ' -f1)\` |"
+            echo "| commit | \`${GITHUB_SHA}\` |"
+            [ -n "${{ inputs.notes }}" ] && echo "| notes | ${{ inputs.notes }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: techyst-cloud-aab-${{ github.sha }}
+          path: app/build/outputs/bundle/**/*.aab
+          if-no-files-found: error
+          retention-days: 30
