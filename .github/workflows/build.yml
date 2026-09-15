@@ -65,6 +65,31 @@ jobs:
           CI: "true"
         run: ./gradlew --no-daemon testGenericDebugUnitTest
 
+      # The generic debug APK is installable and needs no Firebase, so it is
+      # the earliest way to check the branding, the pinned server and login on
+      # a real device. Debug-signed: for testing only, never for distribution.
+      - name: Report the APK identity
+        run: |
+          apk=$(find app/build/outputs/apk -name '*.apk' | head -1)
+          echo "APK: $apk"
+          aapt=$(find "$ANDROID_HOME/build-tools" -name aapt2 | sort -V | tail -1)
+          "$aapt" dump badging "$apk" | grep -E "^package|^application-label:|^launchable-activity" || true
+          {
+            echo "### Techyst Cloud — generic debug APK"
+            echo
+            echo '```'
+            "$aapt" dump badging "$apk" | grep -E "^package|^application-label:" || true
+            echo '```'
+            echo "sha256: \`$(sha256sum "$apk" | cut -d' ' -f1)\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: techyst-cloud-generic-debug-apk-${{ github.sha }}
+          path: app/build/outputs/apk/**/*.apk
+          if-no-files-found: error
+          retention-days: 14
+
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
