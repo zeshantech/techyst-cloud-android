@@ -73,3 +73,5 @@ jobs:
             app/build/reports/**
           if-no-files-found: ignore
           retention-days: 7
+
+# Workflow registered on the Techyst Cloud fork.
